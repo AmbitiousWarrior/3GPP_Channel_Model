@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "C:\\Users\\15751002165\\Desktop\\The channel model"
+		}
+	],
+	"settings": {
+		"python.analysis.extraPaths":[
+				"C:\\Users\\15751002165\\Desktop\\The channel model\\Rician-Fading-Python-main\\src",
+				"C:\\Users\\15751002165\\Desktop\\The channel model\\Rician-Fading-Python-main\\src\\Class",
+				"C:\\Users\\15751002165\\Desktop\\Plexe_SUMO"
+				],
+		"python.pythonPath": "C:\\Users\\15751002165\\anaconda3\\envs\\ChannelModel\\python.exe"
+	},
+	"launch":{
+			"version":"0.2.0",
+			"configurations":[
+				{
+					"name":"Python:当前文件",
+					"type":"python",
+					"request":"launch",
+					"stopOnEntry":false,
+					"env":{"PYTHONPATH":"${workspaceRoot}"},
+					"program":"${file}"
+				}
+			]
+		}
+}
