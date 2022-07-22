@@ -1,13 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "C:\\Users\\15751002165\\Desktop\\The channel model"
+			"path": "C:\\Users\\15751002165\\Desktop\\The channel model\\3GPP_Channel_Model"
 		}
 	],
 	"settings": {
 		"python.analysis.extraPaths":[
-				"C:\\Users\\15751002165\\Desktop\\The channel model\\Rician-Fading-Python-main\\src",
-				"C:\\Users\\15751002165\\Desktop\\The channel model\\Rician-Fading-Python-main\\src\\Class",
+				"C:\\Users\\15751002165\\Desktop\\The channel model\\3GPP_Channel_Model\\Rician-Fading-Python-main\\src",
+				"C:\\Users\\15751002165\\Desktop\\The channel model\\3GPP_Channel_Model\\Rician-Fading-Python-main\\src\\Class",
 				"C:\\Users\\15751002165\\Desktop\\Plexe_SUMO"
 				],
 		"python.pythonPath": "C:\\Users\\15751002165\\anaconda3\\envs\\ChannelModel\\python.exe"

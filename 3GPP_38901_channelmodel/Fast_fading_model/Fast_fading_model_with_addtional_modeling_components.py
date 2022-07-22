@@ -22,7 +22,7 @@ from LOS_probability.LOS_probability import *
 def Simulation_Parameter_Setting():
     Scenario = 'RMa' #RMa, UMa, UMi_Street_canyon, InH_Office
     d_2D_out = 100 
-    f_c = 3*1000*1000*1000  
+    f_c = 5.9*1000*1000*1000  
     return Scenario, d_2D_out, f_c
     
     
@@ -54,7 +54,7 @@ F_tx = 0.0  #UT antenna field patterns
 Ω_UT_c = 0.0    #UT slant angle     倾斜角
 
 
-f_c = 5*1000*1000*1000    #Specify system centre frequency  3Ghz
+f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
 B = 15*1000     #bandwidth   15KHz
 
 #step2  Assign propagation condition (LOS/NLOS)  确定传播条件
@@ -192,10 +192,9 @@ def Generate_large_scale_parameters(scenario):
 
 #propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) 放在main内实现
 
-def τ_n(scenario,propagation_condition):
+def τ_n(propagation_condition,lsp):
     τ_n_2 = []
     τ_n = []
-    lsp = Generate_large_scale_parameters(scenario)
     if propagation_condition == 'LOS':
         lg_DS = lsp['lg_DS'][0] #LOS
         N = lsp['N'][0]
@@ -223,10 +222,9 @@ def τ_n(scenario,propagation_condition):
 
 #step6 Generate cluster powers P_n
 
-def P_n(scenario,propagation_condition, τ_n):
+def P_n(propagation_condition,lsp,τ_n):
     P_n_2 = []
     P_n = []
-    lsp = Generate_large_scale_parameters(scenario)
     if propagation_condition == 'LOS':
         lg_DS = lsp['lg_DS'][0] #LOS
         N = lsp['N'][0]
@@ -301,11 +299,10 @@ a_m = {
     '20':-2.1551 
 }
 
-def φ_n_m_AOA(scenario,propagation_condition, P_n): # AOD follows a procedure similar to AOA
+def φ_n_m_AOA(propagation_condition,lsp,P_n): # AOD follows a procedure similar to AOA
     φ_n_2 = []
     φ_n_m = []
-    
-    lsp = Generate_large_scale_parameters(scenario)
+
     if propagation_condition == 'LOS':
         lg_ASA = lsp['lg_ASA'][0]
         N = lsp['N'][0]
@@ -345,11 +342,10 @@ def φ_n_m_AOA(scenario,propagation_condition, P_n): # AOD follows a procedure s
                 φ_n_m.append(φ_n_m_element) 
     return  φ_n_m       
 
-def φ_n_m_AOD(scenario,propagation_condition, P_n):
+def φ_n_m_AOD(propagation_condition,lsp,P_n):
     φ_n_2 = []
     φ_n_m = []
-    
-    lsp = Generate_large_scale_parameters(scenario)
+
     if propagation_condition == 'LOS':
         lg_ASD = lsp['lg_ASD'][0]
         N = lsp['N'][0]
@@ -400,10 +396,10 @@ C_θ_NLOS_Z = {
     '25':1.282
 }  
                       
-def θ_n_m_ZOA(scenario,propagation_condition, P_n, BS_UT_link ='O2I'):  #θ 用 θ 更合适
+def θ_n_m_ZOA(propagation_condition,lsp,P_n, BS_UT_link ='O2I'):  #θ 用 θ 更合适
     θ_n_2 = []
     θ_n_m = []
-    lsp = Generate_large_scale_parameters(scenario)
+
     if propagation_condition == 'LOS':
         lg_ZSA = lsp['lg_ZSA'][0]
         N = lsp['N'][0]
@@ -452,10 +448,10 @@ def θ_n_m_ZOA(scenario,propagation_condition, P_n, BS_UT_link ='O2I'):  #θ 用
             item = 360 - item
     return  θ_n_m   
 
-def θ_n_m_ZOD(scenario,propagation_condition, P_n, BS_UT_link ='O2I'):
+def θ_n_m_ZOD(propagation_condition,lsp,P_n, BS_UT_link ='O2I'):
     θ_n_2 = []
     θ_n_m = []
-    lsp = Generate_large_scale_parameters(scenario)
+
     if propagation_condition == 'LOS':
         lg_ZSD = lsp['lg_ZSD'][0]
         N = lsp['N'][0]
@@ -511,8 +507,7 @@ def θ_n_m_ZOD(scenario,propagation_condition, P_n, BS_UT_link ='O2I'):
 #step8  Coupling of rays within a cluster for both azimuth and elevation
 
 #step9  Generate the cross polarization power ratios
-def XPR_n_m(scenario,propagation_condition):
-    lsp = Generate_large_scale_parameters(scenario)
+def XPR_n_m(propagation_condition,lsp):
     if propagation_condition == 'LOS':
         N = lsp['N'][0]
         M = lsp['M'][0]    
@@ -533,12 +528,12 @@ def XPR_n_m(scenario,propagation_condition):
 
 #step10   Draw initial random phases
 
-def Initial_random_phases_n_m(scenario,propagation_condition):
+def Initial_random_phases_n_m(lsp,propagation_condition):
     Fei_θθ_n_m = []
     Fei_θφ_n_m = []
     Fei_φθ_n_m = []
     Fei_φφ_n_m = []
-    lsp = Generate_large_scale_parameters(scenario)
+
     if propagation_condition == 'LOS':
         N = lsp['N'][0]
         M = lsp['M'][0]        
@@ -556,7 +551,7 @@ def Initial_random_phases_n_m(scenario,propagation_condition):
 
 
 #step11  Generate channel coefficients for each cluster n and each receiver and transmitter element pair u, s.
-def  Generate_channel_coefficients(scenario,propagation_condition,f_c,  φ_n_m_AOA,φ_n_m_AOD,θ_n_m_ZOA,θ_n_m_ZOD,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m,  τ_n,  P_n ):
+def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ_n_m_AOD,θ_n_m_ZOA,θ_n_m_ZOD,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m,  τ_n,  P_n ):
     
     F_rx_u_θ = []  # 暂时理解 无需做坐标转换,本就是全局坐标（已经过LCS—>GCS的转化）
     # the field patterns of receive antenna element u in the direction of the spherical basis vectors θ^  according to (7.1-11)
@@ -567,7 +562,6 @@ def  Generate_channel_coefficients(scenario,propagation_condition,f_c,  φ_n_m_A
     F_tx_s_φ = [] 
     # the field patterns of transmit antenna element s in the direction of the spherical basis vectors φ^
     
-    lsp = Generate_large_scale_parameters(scenario)
     if propagation_condition == 'LOS':
         lg_ZSD = lsp['lg_ZSD'][0]
         N = lsp['N'][0]
@@ -666,11 +660,37 @@ if __name__=='__main__': #应该使所有的函数以某个周期时间（越快
     
     scenario, d_2D_out, f_c = Simulation_Parameter_Setting()  #获取实验参数设置
 
-    propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) # 计算是否为LOS路径
+    propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) # step2 计算是否为LOS路径
     
-    pass
+    PL_LOS , PL_NLOS = Calculate_pathloss(scenario,d_2D,f_c,h_BS = 35,h_UT = 1.5,h = 5,W = 20)  # step3 计算每条链路的路径损失(包含阴影衰落)
+    
+    lsp = Generate_large_scale_parameters(scenario)  #step4 生成大尺度参数 
+    
+    τ_n_ = τ_n(propagation_condition,lsp)  #step5  Generate cluster delays  τ_n
+    
+    P_n_ = P_n(propagation_condition,lsp,τ_n_)   #step6 Generate cluster powers P_n
+    
+    #step7 Generate arrival angles and departure angles for both azimuth and elevation.
+    θ_n_m_ZOD_ = θ_n_m_ZOD(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
+    θ_n_m_ZOA_ = θ_n_m_ZOA(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
+    φ_n_m_AOA_ = φ_n_m_AOA(propagation_condition,lsp,P_n_)
+    φ_n_m_AOD_ = φ_n_m_AOD(propagation_condition,lsp,P_n_)
+    
+    #step8  Coupling of rays within a cluster for both azimuth and elevation
+    # TODO
+    
+    #step9  Generate the cross polarization power ratios
+    XPR_n_m_ = XPR_n_m(propagation_condition,lsp)  
+    
+    #step10  Draw initial random phases
+    Fei_θθ_n_m, Fei_θφ_n_m, Fei_φθ_n_m, Fei_φφ_n_m = Initial_random_phases_n_m(lsp,propagation_condition)
+    
+    #step11  Generate channel coefficients for each cluster n and each receiver and transmitter element pair u, s.
+    H_u_s = Generate_channel_coefficients(scenario,propagation_condition,f_c,  φ_n_m_AOA_,φ_n_m_AOD_,θ_n_m_ZOA_,θ_n_m_ZOD_,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m_,  τ_n_,  P_n_ )
+    
+    #step12   Apply pathloss and shadowing for the channel coefficients.
+    # TODO
 
 
 
-
-#主要问题：1.初始参数的合理设置；2.全局坐标系与各对象（基站与移动终端）的位置、终端的运动状态（矢量）生成；3.delta_τ函数的有效实现，ns级的仿真如何进行（是否可以用1ms的仿真时间对应1ns的实际时间，可以的话，考虑如何实现）  想法 不需要严格以1ms对应1ns,可以考虑在lms的时间内生成1*1000*1000个对应的相关结果；4.如何获得完整的验证数据集（以方便进行多种工况下、各个中间变量的模拟计算值与验证值的对比）
+#主要问题：1.初始参数的合理设置；2.全局坐标系与各对象（基站与移动终端）的位置、终端的运动状态（矢量）生成；3.delta_τ函数的有效实现，ns级的仿真如何进行（是否可以用1ms的仿真时间对应1ns的实际时间，可以的话，考虑如何实现）  想法 不需要严格以1ms对应1ns,可以考虑在lms的时间内生成1*1000*1000个对应的相关结果；4.如何获得完整的验证数据集（以方便进行多种工况下、各个中间变量的模拟计算值与验证值的对比）;5.合适的循环计算机制，计算周期
