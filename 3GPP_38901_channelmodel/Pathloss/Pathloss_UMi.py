@@ -18,6 +18,8 @@ c = 3.0*100000000 # speed of the llght
 
 #Pathloss [dB], fc is in GHz and d is in meters
 def Pass_Loss_UMi_LOS_and_NLOS(d_2D,f_c,h_BS = 10,h_UT = 1.5,h = 5,W = 20):# h = avg. building height 1.5m<h_UT<22.5m  
+    PL_UMi_LOS = 0.0
+    PL_UMi_NLOS = 0.0
     h_E = 1.0 #UMi
     g_d2D = 0
     if g_d2D <= 18:

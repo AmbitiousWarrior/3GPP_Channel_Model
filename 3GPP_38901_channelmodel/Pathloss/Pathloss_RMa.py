@@ -18,7 +18,8 @@ c = 3.0*100000000 # speed of the llght
 
 #Pathloss [dB], fc is in GHz and d is in meters
 def Pass_Loss_RMa_LOS_and_NLOS(d_2D,f_c,h_BS = 35,h_UT = 1.5,h = 5,W = 20):# h = avg. building height 5m<h<50m  W = avg. street width   5m<W<50m 
-    
+    PL_RMa_LOS = 0.0
+    PL_RMa_NLOS = 0.0
     d_BP = 2*math.pi*h_BS*h_UT*f_c*c
     d_3D = math.sqrt(math.pow(d_2D, 2)+math.pow(abs(h_BS-h_UT), 2))
     PL_1 = 20*math.log10(40*math.pi*d_3D*f_c/3) +  min(0.03*math.pow(h, 1.72) , 10)*math.log10(d_3D) - min(0.044*math.pow(h, 1.72) , 14.77) + 0.002*math.log10(h) *d_3D

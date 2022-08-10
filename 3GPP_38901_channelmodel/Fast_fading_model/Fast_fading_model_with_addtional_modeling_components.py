@@ -13,30 +13,31 @@ from re import L
 import numpy as np
 import math
 from sympy import DiracDelta
-import sys
-sys.path.append('../')
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #获取到文件的动态的绝对路径，基于此，在代码中调整其他文件的相对路径
+sys.path.insert(0,parentdir) 
 from Pathloss import *
 from LOS_probability.LOS_probability import *
 
 
 def Simulation_Parameter_Setting():
-    Scenario = 'RMa' #RMa, UMa, UMi_Street_canyon, InH_Office
-    d_2D_out = 100 
-    f_c = 5.9*1000*1000*1000  
+    Scenario = 'UMi_Street_canyon' #RMa, UMa, UMi_Street_canyon, InH_Office
+    d_2D_out = 50*math.sqrt(2) 
+    f_c = 5.9   #*1000*1000*1000  
     return Scenario, d_2D_out, f_c
     
     
 
 
 
-# step1 Set environment, network layout, and antenna array parameters 设置环境、网络布局和天线阵列参数
+# step1 Set environment, network layout, and antenna array parameters 设置环境、网络布局和天线阵列参数  TODO Need someone to verify the parameters for me 
 c = 3.0*100*1000*1000 # speed of the llght
-d_2D = 0.0
-h_UT = 1.5
+d_2D = 50*math.sqrt(2) 
+h_UT = 1.5    
 h_BS = 50
-θ = 0.0     #zenith angle 
-θ_LOS_ZOD = 0.0
-θ_LOS_ZOA = 0.0
+θ = 90.0     #zenith angle 
+θ_LOS_ZOD = -45.0   # Azimuth angle Of Departure
+θ_LOS_ZOA = 45.0   # Azimuth angle Of Arrival
 
 φ = 0.0     #azimuth angle
 φ_LOS_AOD = 0.0
@@ -50,12 +51,14 @@ F_tx = 0.0  #UT antenna field patterns
 Ω_BS_c = 0.0    #BS slant angle
 
 Ω_UT_a = 0.0    #UT bearing angle   方位角 
-Ω_UT_b = 0.0    #UT downtilt angle  下倾角   定义天线阵列的方位
+Ω_UT_b = 10.0    #UT downtilt angle  下倾角   定义天线阵列的方位
 Ω_UT_c = 0.0    #UT slant angle     倾斜角
 
+UT_speed = 3.0  # Give speed and direction of motion of UT
+UT_direction = 0.0
 
 f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
-B = 15*1000     #bandwidth   15KHz
+B = 20*1000*1000     #bandwidth   20MKHz
 
 #step2  Assign propagation condition (LOS/NLOS)  确定传播条件
 def Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5):  #scenario 应用场景
@@ -108,7 +111,7 @@ def Generate_large_scale_parameters(scenario):
     lsp = {}
     if scenario == 'RMa':
         lsp['lg_DS'] = [np.random.normal( - 7.49, 0.55 , 1) ,np.random.normal( -7.43, 0.48 , 1) ,np.random.normal(-7.47, 0.24 , 1)]
-        lsp['lg_ADS'] = [np.random.normal( 0.9, 0.38 , 1) ,np.random.normal( 0.95, 0.45 , 1) ,np.random.normal(0.67, 0.18 , 1)]
+        lsp['lg_ASD'] = [np.random.normal( 0.9, 0.38 , 1) ,np.random.normal( 0.95, 0.45 , 1) ,np.random.normal(0.67, 0.18 , 1)]
         lsp['lg_ASA'] = [np.random.normal( 1.52, 0.24 , 1) ,np.random.normal( 1.52, 0.13 , 1) ,np.random.normal(1.66, 0.21 , 1)]
         lsp['lg_ZSA'] = [np.random.normal( 0.47, 0.4 , 1) ,np.random.normal( 0.58, 0.37 , 1) ,np.random.normal(0.63, 0.22 , 1)]
         lsp['lg_ZSD'] = [np.random.normal(max(-1, -0.17*(d_2D/1000)- 0.01*abs(h_UT-1.5) + 0.22), 0.34 , 1) ,np.random.normal(max(-0.1, 0.19*(d_2D/1000)+ 0.01*(h_UT-1.5) + 0.28), 0.3 , 1) ,np.random.normal(max(-0.1, 0.19*(d_2D/1000)+ 0.01*(h_UT-1.5) + 0.28) , 0.3 , 1)]
@@ -132,7 +135,7 @@ def Generate_large_scale_parameters(scenario):
         
     elif scenario == 'UMa':
         lsp['lg_DS'] = [np.random.normal(-6.955 - 0.0963*math.log10(f_c), 0.66 , 1) ,np.random.normal(-6.28 - 0.204*math.log10(f_c), 0.39 , 1) ,np.random.normal(-6.62, 0.32 , 1)]
-        lsp['lg_ADS'] = [np.random.normal(1.06 + 0.1114*math.log10(f_c), 0.28 , 1) ,np.random.normal(1.5 - 0.1144*math.log10(f_c), 0.28, 1) ,np.random.normal(1.25, 0.42 , 1)]
+        lsp['lg_ASD'] = [np.random.normal(1.06 + 0.1114*math.log10(f_c), 0.28 , 1) ,np.random.normal(1.5 - 0.1144*math.log10(f_c), 0.28, 1) ,np.random.normal(1.25, 0.42 , 1)]
         lsp['lg_ASA'] = [np.random.normal(1.81, 0.2 , 1) ,np.random.normal(2.08 - 0.27*math.log10(f_c), 0.11 , 1) ,np.random.normal(1.76 , 0.16 , 1)]
         lsp['lg_ZSA'] = [np.random.normal(0.95, 0.16 , 1) ,np.random.normal(-0.3236*math.log10(f_c) + 1.512 , 0.16 , 1) ,np.random.normal(1.01 , 0.43 , 1)]
         lsp['lg_ZSD'] = [np.random.normal(max(-0.5, -2.1*(d_2D/1000) - 0.01*(h_UT-1.5) + 0.75), 0.4 , 1) ,np.random.normal(max(-0.5, -2.1*(d_2D/1000) - 0.01*(h_UT-1.5) + 0.9), 0.49 , 1) ,0.0]
@@ -156,7 +159,7 @@ def Generate_large_scale_parameters(scenario):
         
     elif scenario == 'UMi_Street_canyon':
         lsp['lg_DS'] = [np.random.normal(-0.24*math.log10(1+ f_c) - 7.14, 0.38 , 1) ,np.random.normal(-0.24*math.log10(1+ f_c) - 6.83, 0.16*math.log10(1+ f_c) + 0.28 , 1) ,np.random.normal(-6.62, 0.32 , 1)]
-        lsp['lg_ADS'] = [np.random.normal(-0.05*math.log10(1+ f_c) + 1.21, 0.41 , 1) ,np.random.normal(-0.23*math.log10(1+ f_c) + 1.53, 0.11*math.log10(1+ f_c) + 0.33 , 1) ,np.random.normal(1.25, 0.42 , 1)]
+        lsp['lg_ASD'] = [np.random.normal(-0.05*math.log10(1+ f_c) + 1.21, 0.41 , 1) ,np.random.normal(-0.23*math.log10(1+ f_c) + 1.53, 0.11*math.log10(1+ f_c) + 0.33 , 1) ,np.random.normal(1.25, 0.42 , 1)]
         lsp['lg_ASA'] = [np.random.normal(-0.08*math.log10(1+ f_c) + 1.73, 0.014*math.log10(1+ f_c) + 0.28 , 1) ,np.random.normal(-0.08*math.log10(1+ f_c) + 1.81, 0.05*math.log10(1+ f_c) + 0.3 , 1) ,np.random.normal(1.76 , 0.16 , 1)]
         lsp['lg_ZSA'] = [np.random.normal(-0.1*math.log10(1+ f_c) + 0.73, -0.04*math.log10(1+ f_c) + 0.34 , 1) ,np.random.normal(-0.04*math.log10(1+ f_c) + 0.92, -0.07*math.log10(1+ f_c) + 0.41 , 1) ,np.random.normal(1.01 , 0.43 , 1)]
         lsp['lg_ZSD'] = [np.random.normal(max(-0.21, -14.8*(d_2D/1000)+ 0.01*abs(h_UT-h_BS) + 0.83), 0.35 , 1) ,np.random.normal(max(-0.5, -3.1*(d_2D/1000)+ 0.01*max((h_UT-h_BS),0) + 0.2) , 0.35 , 1)  ,0.0]
@@ -208,10 +211,10 @@ def τ_n(propagation_condition,lsp):
     DS = math.pow(10,lg_DS)
     for i in range(N):
         X_n = random.uniform(0, 1)
-        τ_n_2.append(-r_τ*DS*math.log(X_n))
+        τ_n_2.append(-r_τ*DS*math.log(X_n))  #*1000*1000*1000
     τ_n_min = min(τ_n_2)
     for i in range(N):
-        τ_n = τ_n_2[i] - τ_n_min
+        τ_n.append(τ_n_2[i] - τ_n_min)
     τ_n = np.sort(τ_n)
     if propagation_condition == 'LOS':
         C_τ = 0.7705 - 0.0433*K + 0.0002*math.pow(K,2) + 0.000017*math.pow(K,3)
@@ -229,7 +232,10 @@ def P_n(propagation_condition,lsp,τ_n):
         lg_DS = lsp['lg_DS'][0] #LOS
         N = lsp['N'][0]
         r_τ = lsp['r_τ'][0]
-        K = lsp['K'][0]
+        if lsp['K'][0] <=0.0:
+            K = 9.0
+        else:
+            K = lsp['K'][0]
         ζ = lsp['ζ'][0]
     else:
         lg_DS = lsp['lg_DS'][1] #NLOS
@@ -242,19 +248,23 @@ def P_n(propagation_condition,lsp,τ_n):
     Z_n = np.random.normal(0.5, 1, 1)
     for i in range(N):
         Z_n = np.random.normal(0.0, math.pow(ζ,2), 1)
-        P_n_2.append(math.exp(-τ_n(i)*(r_τ-1)/r_τ/DS)*math.pow(10,-Z_n/10))
+        P_n_2.append(math.exp(-τ_n[i]*(r_τ-1)/r_τ/DS)*math.pow(10,-Z_n/10))
+    # print('P_n_2',P_n_2)
     sum_P_n_2= sum(P_n_2)
     if propagation_condition != 'LOS':
         for i in range(N):
             P_n.append(P_n_2[i]/sum_P_n_2)
             
-    P1_LOS = K/(K + 1)   #K_R  need to verify
     if propagation_condition == 'LOS':
+        P1_LOS = K/(K + 1)   #TODO  K_R  need to verify
+        # print('K',K)
         for i in range(N):
             if i != 0:  #TODO  δ(n-1)*(P1_LOS) 需要确定δ(n-1)的值  n-1不等于0时：δ(n-1)=0  n-1等于0时：δ(n-1)= +无穷 ？？？？ Solved 除了LOS 其他所有鏃功率和为1/(1+K_R)  LOS+NLOS的归一化功率和为1  仔细读协议 答案一般就在其中 nice job
-                P_n.append(P_n_2[i]/sum_P_n_2/(K + 1) + 0.0*(P1_LOS))
+                P_n.append(P_n_2[i]/sum_P_n_2/(K + 1) + 0*(P1_LOS))
             else:
-                P_n.append(P1_LOS) #LOS分量的归一化功率 
+                P_n.append(P_n_2[i]/sum_P_n_2/(K + 1) + 1*(P1_LOS)) #LOS分量的归一化功率 
+                
+    # print('P_n',P_n)
     return P_n    
     
 #In the case of LOS condition an additional specular component is added to the first cluster. 
@@ -317,9 +327,9 @@ def φ_n_m_AOA(propagation_condition,lsp,P_n): # AOD follows a procedure similar
 
     ASA= min(math.pow(10,lg_ASA), 104) 
     if propagation_condition == 'LOS':
-        C_φ = C_φ_NLOS_A[str(N)]
-    else:
         C_φ = C_φ_NLOS_A[str(N)]*(1.1035 - 0.028*K - 0.002*math.pow(K,2) + 0.0001*math.pow(K,3))
+    else:
+        C_φ = C_φ_NLOS_A[str(N)]
     for i in range(N):
         φ_n_2.append(2*(ASA/1.4)*math.sqrt(-math.log(P_n[i]/max(P_n)))/C_φ) 
     if propagation_condition != 'LOS': 
@@ -360,9 +370,9 @@ def φ_n_m_AOD(propagation_condition,lsp,P_n):
 
     ASD= min(math.pow(10,lg_ASD), 104) 
     if propagation_condition == 'LOS':
-        C_φ = C_φ_NLOS_A[str(N)]
-    else:
         C_φ = C_φ_NLOS_A[str(N)]*(1.1035 - 0.028*K - 0.002*math.pow(K,2) + 0.0001*math.pow(K,3))
+    else:
+        C_φ = C_φ_NLOS_A[str(N)]
     for i in range(N):
         φ_n_2.append(2*(ASD/1.4)*math.sqrt(-math.log(P_n[i]/max(P_n)))/C_φ) 
     if propagation_condition != 'LOS': 
@@ -414,9 +424,9 @@ def θ_n_m_ZOA(propagation_condition,lsp,P_n, BS_UT_link ='O2I'):  #θ 用 θ �
 
     ZSA = min(math.pow(10,lg_ZSA), 52) 
     if propagation_condition == 'LOS':
-        C_θ = C_θ_NLOS_Z[str(N)]
-    else:
         C_θ = C_θ_NLOS_Z[str(N)]*(1.3086 + 0.0339*K - 0.0077*math.pow(K,2) + 0.0002*math.pow(K,3))
+    else:
+        C_θ = C_θ_NLOS_Z[str(N)]
     for i in range(N):
         θ_n_2.append(-ZSA*math.log(P_n[i]/max(P_n))/C_θ) 
         
@@ -457,22 +467,23 @@ def θ_n_m_ZOD(propagation_condition,lsp,P_n, BS_UT_link ='O2I'):
         N = lsp['N'][0]
         M = lsp['M'][0]        
         K = lsp['K'][0]
-        c_ZSD = lsp['c_ZSD'][0]
+        # c_ZSD = lsp['c_ZSD'][0]
         μ_lg_ZSD = lsp['μ_lg_ZSD'][0]
         μ_offset_ZOD = lsp['μ_offset_ZOD'][0]
     else:
         lg_ZSD = lsp['lg_ZSD'][1]
         N = lsp['N'][1]
         M = lsp['M'][1]   
-        c_ZSD = lsp['c_ZSD'][1]
+        # c_ZSD = lsp['c_ZSD'][1]
         μ_lg_ZSD = lsp['μ_lg_ZSD'][1]
         μ_offset_ZOD = lsp['μ_offset_ZOD'][1]
-    ZSD = min(math.pow(lg_ZSD), 52) 
+    ZSD = min(math.pow(lg_ZSD,10), 52) 
     if propagation_condition == 'LOS':
-        C_θ = C_θ_NLOS_Z[str(N)]
-    else:
         C_θ = C_θ_NLOS_Z[str(N)]*(1.3086 + 0.0339*K - 0.0077*math.pow(K,2) + 0.0002*math.pow(K,3))
+    else:
+        C_θ = C_θ_NLOS_Z[str(N)]
     for i in range(N):
+        # print(P_n[i],max(P_n),sum(P_n))
         θ_n_2.append(-ZSD*math.log(P_n[i]/max(P_n))/C_θ) 
         
     if BS_UT_link == 'O2I':
@@ -558,7 +569,7 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
     F_rx_u_φ = []
     # the field patterns of receive antenna element u in the direction of the spherical basis vectors φ^
     F_tx_s_θ = [] 
-    # the field patterns of transmit antenna element s in the direction of the spherical basis vectors  θ^   
+    # the field patterns of transmit antenna element s in the direction of the spherical basis vectors θ^   
     F_tx_s_φ = [] 
     # the field patterns of transmit antenna element s in the direction of the spherical basis vectors φ^
     
@@ -568,7 +579,7 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
         M = lsp['M'][0]        
         K = lsp['K'][0]
         c_DS = lsp['c_DS'][0]
-        c_ZSD = lsp['c_ZSD'][0]
+        # c_ZSD = lsp['c_ZSD'][0]
         μ_lg_ZSD = lsp['μ_lg_ZSD'][0]
         μ_offset_ZOD = lsp['μ_offset_ZOD'][0]
     else:
@@ -576,18 +587,18 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
         N = lsp['N'][1]
         M = lsp['M'][1]   
         c_DS = lsp['c_DS'][1]
-        c_ZSD = lsp['c_ZSD'][1]
+        # c_ZSD = lsp['c_ZSD'][1]
         μ_lg_ZSD = lsp['μ_lg_ZSD'][1]
         μ_offset_ZOD = lsp['μ_offset_ZOD'][1]
         
     for i in range(N):
         for j in range(M):
-            F_rx_u_θ.append([[θ_n_m_ZOA[i*M+j]],φ_n_m_AOA[i*M+j]])  #θ_n_m_ZOA等的值由φ_n_m_ZOA等函数获取
-            F_rx_u_φ.append([[θ_n_m_ZOA[i*M+j]],φ_n_m_AOA[i*M+j]])
-            F_tx_s_θ.append([[θ_n_m_ZOD[i*M+j]],φ_n_m_AOD[i*M+j]])
-            F_tx_s_φ.append([[θ_n_m_ZOD[i*M+j]],φ_n_m_AOD[i*M+j]])
+            F_rx_u_θ.append(1) 
+            F_rx_u_φ.append(1) 
+            F_tx_s_θ.append(1) 
+            F_tx_s_φ.append(1) 
             
-    Lambda_0 = c/f_c   # the wavelength of the carrier frequency
+    Lambda_0 = c/f_c/(1000*1000*1000)  # the wavelength of the carrier frequency
                 
     r_rx_n_m = []      
     r_tx_n_m = []         
@@ -602,10 +613,10 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
 
     #TODO   θ_n_m_ZOA 的单位 角度还是弧度 math 与 cmath 三角函数的区别  整个项目函数库尽量统一 done 用math库 其输入为弧度
     # θ_n_m_ZOA 的单位应该为角度  使用math.radians()将角度转化为弧度
-    d_rx_u = 0     # the location vector of receive antenna element u
-    d_tx_s = 0     # the location vector of transmit antenna element s
+    d_rx_u = np.transpose(np.array([0,0,1]))      # the location vector of receive antenna element u   TODO
+    d_tx_s = np.transpose(np.array([math.sqrt(2)/2,0,math.sqrt(2)/2]))     # the location vector of transmit antenna element s
     v = 0
-    φ_v = 0.0      #  azimuth angle
+    φ_v = 0.0      #  azimuth angle   TODO
     θ_v = 0.0      #  elevation angle
     
       
@@ -613,39 +624,54 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
 
     #For the N – 2 weakest clusters, say n = 3, 4,…, N, the channel coefficients 
 
-    def delta_τ(t): #TODO to verify!!!!!!!!!!!!!!!!!!!
-        return DiracDelta(t)
-
     H_u_s_n_NLOS_t_1_and_2 = []
     H_u_s_n_NLOS_t_3_N = []
     H_u_s_n_m_NLOS_t = []
     
+    for i in range(N):
+        temp_result1 = []
+        temp_result2 = []
+        for j in range(M):
+            if i < 2:
+                temp2 = cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0)
+                print('temp2',temp2)
+                
+                temp3 = np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]),np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) )
+                print('temp3',temp3)
+                
+                H_u_s_n_m_NLOS_t = math.sqrt(P_n[i]/M) * np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]),np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) )    * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0)
+                print('H_u_s_n_m_NLOS_t',H_u_s_n_m_NLOS_t)                
+                # H_u_s_n_m_NLOS_t = math.sqrt(P_n[i]/M) * np.array([[F_rx_u_θ[i*M+j]],[F_rx_u_φ[i*M+j]]]) * np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]]) * np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0)
+
+                for k in range(20):
+                    if k < 8 or k == 18 or k == 19:
+                        # print(delta_τ(τ_n[i]*1000*1000*1000),(τ_n[i]*1000*1000*1000))
+                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i])*1/20)# default 3.91 ns  step 5    
+                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]])              
+                    if k >= 8 and k < 12 or k == 16 or k == 17:
+                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i] + 1.28*c_DS)*1/20) 
+                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]+ 1.28*c_DS]) 
+                    if k >= 12 and k < 16:
+                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i] + 2.56*c_DS)*1/20)   
+                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]]+ 2.56*c_DS)          
+            else:         
+                temp_result2.append(  [math.sqrt(P_n[i]/M)* np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]) , np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) ) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0), τ_n[i]])  
+                # temp_result2.append(np.array([[F_rx_u_θ[i*M+j]],[F_rx_u_φ[i*M+j]]]) * np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]]) * np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0))
+                
+        # H_u_s_n_NLOS_t_1_and_2.append(sum(temp_result1))            
+        # H_u_s_n_NLOS_t_3_N.append(math.sqrt(P_n[i]/M)*sum(temp_result2))  #TODO need to verify
+        H_u_s_n_NLOS_t_1_and_2 = temp_result1            
+        H_u_s_n_NLOS_t_3_N = temp_result2
+    H_u_s_NLOS_τ_t =  H_u_s_n_NLOS_t_1_and_2 + H_u_s_n_NLOS_t_3_N
+        
     if propagation_condition != 'LOS':
-        for i in range(N):
-            temp_result1 = []
-            temp_result2 = []
-            for j in range(M):
-                if i < 2:
-                    H_u_s_n_m_NLOS_t = math.sqrt(P_n[i]/M) * np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]) * np.array([math.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*math.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*math.exp(complex(0, Fei_φθ_n_m[i*M+j])),math.exp(complex(0, Fei_φφ_n_m[i*M+j]))]) * np.array([F_tx_s_θ[i*M+j],F_tx_s_φ[i*M+j]]) * math.exp(complex(0, 1)*2*math.pi*(r_rx_n_m[i*M+j] * d_rx_u)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_tx_n_m[i*M+j] * d_tx_s)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_rx_n_m[i*M+j] * v_)/Lambda_0)
-                    for k in range(20):
-                        if k < 8 or k == 18 or k == 19:
-                            temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[k])*1/20)# default 3.91 ns  step 5                  
-                        if k >= 8 and k < 12 or k == 16 or k == 17:
-                            temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[k] + 1.28*c_DS)*1/20) 
-                        if k >= 12 and k < 16:
-                            temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[k] + 2.56*c_DS)*1/20)            
-                else:           
-                    temp_result2.append( np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]) * np.array([math.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*math.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*math.exp(complex(0, Fei_φθ_n_m[i*M+j])),math.exp(complex(0, Fei_φφ_n_m[i*M+j]))]) * np.array([F_tx_s_θ[i*M+j],F_tx_s_φ[i*M+j]]) * math.exp(complex(0, 1)*2*math.pi*(r_rx_n_m[i*M+j] * d_rx_u)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_tx_n_m[i*M+j] * d_tx_s)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_rx_n_m[i*M+j] * v_)/Lambda_0) )
-                    
-            H_u_s_n_NLOS_t_1_and_2.append(sum(temp_result1))            
-            H_u_s_n_NLOS_t_3_N.append(math.sqrt(P_n[i]/M)*sum(temp_result2))  #TODO need to verify
-        H_u_s_NLOS_τ_t =  H_u_s_n_NLOS_t_1_and_2 + H_u_s_n_NLOS_t_3_N
         return H_u_s_NLOS_τ_t
     else:    
         d_3D = math.sqrt(math.pow(d_2D, 2)+math.pow(abs(h_BS-h_UT), 2))
-        H_u_s_1_LOS_t = np.array([θ_LOS_ZOA,φ_LOS_AOA],[θ_LOS_ZOA,φ_LOS_AOA]) *np.array([1,0],[0,-1]) * np.array([θ_LOS_ZOD,φ_LOS_AOD],[θ_LOS_ZOD,φ_LOS_AOD]) * math.exp(complex(0, 1)*2*math.pi*d_3D/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_rx_LOS * d_rx_u)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_tx_LOS * d_tx_s)/Lambda_0) * math.exp(complex(0, 1)*2*math.pi*(r_rx_LOS* v_)/Lambda_0)
+        H_u_s_1_LOS_t = np.dot( np.dot(np.array([1,1]), np.array([[1,0],[0,-1]]) ), np.array([[1],[1]])) * cmath.exp(complex(0, 1)*2*np.pi*d_3D/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS ,np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_LOS ,np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS , np.transpose(v_))/Lambda_0)
+        # H_u_s_1_LOS_t = np.dot( np.dot(np.array([[θ_LOS_ZOA,φ_LOS_AOA],[θ_LOS_ZOA,φ_LOS_AOA]]), np.array([[1,0],[0,-1]]) ), np.array([[θ_LOS_ZOD,φ_LOS_AOD],[θ_LOS_ZOD,φ_LOS_AOD]])) * cmath.exp(complex(0, 1)*2*np.pi*d_3D/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS ,np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_LOS ,np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS , np.transpose(v_))/Lambda_0)
 
-        H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + math.sqrt(K/(K+1))*H_u_s_1_LOS_t*delta_τ(τ_n[0])
+        H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + [math.sqrt(K/(K+1))*H_u_s_1_LOS_t,τ_n[0]]
         return H_u_s_LOS_τ_t
     #For the two strongest clusters, say n = 1 and 2, rays are spread in delay to three sub-clusters (per cluster), with fixed delay offset.
 
@@ -659,38 +685,50 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
 if __name__=='__main__': #应该使所有的函数以某个周期时间（越快越好）快速迭代运行
     
     scenario, d_2D_out, f_c = Simulation_Parameter_Setting()  #获取实验参数设置
+    
+    result = []
+    for i in range(10): #NRT仿真中，不在具有时间的概念，用每次循环表征一个无线传播的时隙(1ns，考虑到多径延时的度量单位为ns)，其他随时间改变的量值，通过对应的时间序列计算获取 
+        # TODO  确定多久进行一次是否为LOS路径的估计 1ns太快了吧
+        propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) # step2 计算是否为LOS路径
+        print(propagation_condition)
+        PL_LOS , PL_NLOS = Calculate_pathloss(scenario,d_2D,f_c,h_BS = 50,h_UT = 1.5,h = 5,W = 20)  # step3 计算每条链路的路径损失(包含阴影衰落)
+        # print(PL_LOS , PL_NLOS)
+        lsp = Generate_large_scale_parameters(scenario)  #step4 生成大尺度参数 
+        # print(lsp)
+        τ_n_ = τ_n(propagation_condition,lsp)  #step5  Generate cluster delays  τ_n
+        # print(τ_n_)
+        P_n_ = P_n(propagation_condition,lsp,τ_n_)   #step6 Generate cluster powers P_n
+        # print(P_n_)
+        # #step7 Generate arrival angles and departure angles for both azimuth and elevation.
+        θ_n_m_ZOD_ = θ_n_m_ZOD(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
+        θ_n_m_ZOA_ = θ_n_m_ZOA(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
+        φ_n_m_AOA_ = φ_n_m_AOA(propagation_condition,lsp,P_n_)
+        φ_n_m_AOD_ = φ_n_m_AOD(propagation_condition,lsp,P_n_)
+        # print(θ_n_m_ZOD_)
+        # print(θ_n_m_ZOA_)
+        # print(φ_n_m_AOA_)
+        # print(φ_n_m_AOD_)
+        # #step8  Coupling of rays within a cluster for both azimuth and elevation
+        # # TODO        
+        # #step9  Generate the cross polarization power ratios
+        XPR_n_m_ = XPR_n_m(propagation_condition,lsp)  
+        # print(XPR_n_m_)
+        # #step10  Draw initial random phases
+        Fei_θθ_n_m, Fei_θφ_n_m, Fei_φθ_n_m, Fei_φφ_n_m = Initial_random_phases_n_m(lsp,propagation_condition)
+        # print(Fei_θθ_n_m)
+        # print(Fei_θφ_n_m)
+        # print(Fei_φθ_n_m)
+        # print(Fei_φφ_n_m)
+        # #step11  Generate channel coefficients for each cluster n and each receiver and transmitter element pair u, s.
+        H_u_s = Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA_,φ_n_m_AOD_,θ_n_m_ZOA_,θ_n_m_ZOD_,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m_,  τ_n_,  P_n_ )
+        print('H_u_s',H_u_s)
+        # #step12   Apply pathloss and shadowing for the channel coefficients.
+        # # TODO
+        
+        # result.append([H_u_s])
 
-    propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) # step2 计算是否为LOS路径
     
-    PL_LOS , PL_NLOS = Calculate_pathloss(scenario,d_2D,f_c,h_BS = 35,h_UT = 1.5,h = 5,W = 20)  # step3 计算每条链路的路径损失(包含阴影衰落)
-    
-    lsp = Generate_large_scale_parameters(scenario)  #step4 生成大尺度参数 
-    
-    τ_n_ = τ_n(propagation_condition,lsp)  #step5  Generate cluster delays  τ_n
-    
-    P_n_ = P_n(propagation_condition,lsp,τ_n_)   #step6 Generate cluster powers P_n
-    
-    #step7 Generate arrival angles and departure angles for both azimuth and elevation.
-    θ_n_m_ZOD_ = θ_n_m_ZOD(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
-    θ_n_m_ZOA_ = θ_n_m_ZOA(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
-    φ_n_m_AOA_ = φ_n_m_AOA(propagation_condition,lsp,P_n_)
-    φ_n_m_AOD_ = φ_n_m_AOD(propagation_condition,lsp,P_n_)
-    
-    #step8  Coupling of rays within a cluster for both azimuth and elevation
-    # TODO
-    
-    #step9  Generate the cross polarization power ratios
-    XPR_n_m_ = XPR_n_m(propagation_condition,lsp)  
-    
-    #step10  Draw initial random phases
-    Fei_θθ_n_m, Fei_θφ_n_m, Fei_φθ_n_m, Fei_φφ_n_m = Initial_random_phases_n_m(lsp,propagation_condition)
-    
-    #step11  Generate channel coefficients for each cluster n and each receiver and transmitter element pair u, s.
-    H_u_s = Generate_channel_coefficients(scenario,propagation_condition,f_c,  φ_n_m_AOA_,φ_n_m_AOD_,θ_n_m_ZOA_,θ_n_m_ZOD_,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m_,  τ_n_,  P_n_ )
-    
-    #step12   Apply pathloss and shadowing for the channel coefficients.
-    # TODO
 
 
 
-#主要问题：1.初始参数的合理设置；2.全局坐标系与各对象（基站与移动终端）的位置、终端的运动状态（矢量）生成；3.delta_τ函数的有效实现，ns级的仿真如何进行（是否可以用1ms的仿真时间对应1ns的实际时间，可以的话，考虑如何实现）  想法 不需要严格以1ms对应1ns,可以考虑在lms的时间内生成1*1000*1000个对应的相关结果；4.如何获得完整的验证数据集（以方便进行多种工况下、各个中间变量的模拟计算值与验证值的对比）;5.合适的循环计算机制，计算周期
+#主要问题：1.初始参数的合理设置；2.全局坐标系与各对象（基站与移动终端）的位置、终端的运动状态（矢量）生成；3.delta_τ函数的有效实现，ns级的仿真如何进行（是否可以用1ms的仿真时间对应1ns的实际时间，可以的话，考虑如何实现）  想法 不需要严格以1ms对应1ns,可以考虑在lms的时间内生成1*1000*1000个对应的相关结果；4.如何获得完整的验证数据集（以方便进行多种工况下、各个中间变量的模拟计算值与验证值的对比）;5.合适的循环(调度)计算机制，计算周期

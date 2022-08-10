@@ -18,7 +18,8 @@ c = 3.0*100000000 # speed of the llght
 
 #Pathloss [dB], fc is in GHz and d is in meters
 def Pass_Loss_InH_LOS_and_NLOS(d_2D,f_c,h_BS = 10,h_UT = 1.5,h = 5,W = 20):#  1m<d_3D<150m  
-    
+    PL_InH_LOS = 0.0
+    PL_InH_NLOS = 0.0
     d_3D = math.sqrt(math.pow(d_2D, 2)+math.pow(abs(h_BS-h_UT), 2))
     PL_InH_LOS = 32.4 + 17.3*math.log10(d_3D) + 20*math.log10(f_c) + 3
        
