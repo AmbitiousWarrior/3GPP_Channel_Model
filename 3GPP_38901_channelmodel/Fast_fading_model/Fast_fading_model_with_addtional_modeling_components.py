@@ -641,25 +641,18 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
                 
                 H_u_s_n_m_NLOS_t = math.sqrt(P_n[i]/M) * np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]),np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) )    * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0)
                 print('H_u_s_n_m_NLOS_t',H_u_s_n_m_NLOS_t)                
-                # H_u_s_n_m_NLOS_t = math.sqrt(P_n[i]/M) * np.array([[F_rx_u_θ[i*M+j]],[F_rx_u_φ[i*M+j]]]) * np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]]) * np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0)
 
                 for k in range(20):
                     if k < 8 or k == 18 or k == 19:
                         # print(delta_τ(τ_n[i]*1000*1000*1000),(τ_n[i]*1000*1000*1000))
-                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i])*1/20)# default 3.91 ns  step 5    
-                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]])              
+                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]])  # default 3.91 ns  step 5         
                     if k >= 8 and k < 12 or k == 16 or k == 17:
-                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i] + 1.28*c_DS)*1/20) 
                         temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]+ 1.28*c_DS]) 
                     if k >= 12 and k < 16:
-                        # temp_result1.append(H_u_s_n_m_NLOS_t*delta_τ(τ_n[i] + 2.56*c_DS)*1/20)   
                         temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]]+ 2.56*c_DS)          
             else:         
                 temp_result2.append(  [math.sqrt(P_n[i]/M)* np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]) , np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) ) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0), τ_n[i]])  
-                # temp_result2.append(np.array([[F_rx_u_θ[i*M+j]],[F_rx_u_φ[i*M+j]]]) * np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]]) * np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0))
-                
-        # H_u_s_n_NLOS_t_1_and_2.append(sum(temp_result1))            
-        # H_u_s_n_NLOS_t_3_N.append(math.sqrt(P_n[i]/M)*sum(temp_result2))  #TODO need to verify
+
         H_u_s_n_NLOS_t_1_and_2 = temp_result1            
         H_u_s_n_NLOS_t_3_N = temp_result2
     H_u_s_NLOS_τ_t =  H_u_s_n_NLOS_t_1_and_2 + H_u_s_n_NLOS_t_3_N
@@ -669,7 +662,6 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
     else:    
         d_3D = math.sqrt(math.pow(d_2D, 2)+math.pow(abs(h_BS-h_UT), 2))
         H_u_s_1_LOS_t = np.dot( np.dot(np.array([1,1]), np.array([[1,0],[0,-1]]) ), np.array([[1],[1]])) * cmath.exp(complex(0, 1)*2*np.pi*d_3D/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS ,np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_LOS ,np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS , np.transpose(v_))/Lambda_0)
-        # H_u_s_1_LOS_t = np.dot( np.dot(np.array([[θ_LOS_ZOA,φ_LOS_AOA],[θ_LOS_ZOA,φ_LOS_AOA]]), np.array([[1,0],[0,-1]]) ), np.array([[θ_LOS_ZOD,φ_LOS_AOD],[θ_LOS_ZOD,φ_LOS_AOD]])) * cmath.exp(complex(0, 1)*2*np.pi*d_3D/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS ,np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_LOS ,np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS , np.transpose(v_))/Lambda_0)
 
         H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + [math.sqrt(K/(K+1))*H_u_s_1_LOS_t,τ_n[0]]
         return H_u_s_LOS_τ_t
