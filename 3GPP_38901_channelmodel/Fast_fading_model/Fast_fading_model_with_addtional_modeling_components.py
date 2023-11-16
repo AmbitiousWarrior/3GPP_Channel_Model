@@ -18,6 +18,7 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #获取�
 sys.path.insert(0,parentdir) 
 from Pathloss import *
 from LOS_probability.LOS_probability import *
+from Numerical_antenna_model.Numerical_antenna_model import *
 
 
 def Simulation_Parameter_Setting():
@@ -26,39 +27,36 @@ def Simulation_Parameter_Setting():
     f_c = 5.9   #*1000*1000*1000  
     return Scenario, d_2D_out, f_c
     
-    
-
-
 
 # step1 Set environment, network layout, and antenna array parameters 设置环境、网络布局和天线阵列参数  TODO Need someone to verify the parameters for me 
-c = 3.0*100*1000*1000 # speed of the llght
-d_2D = 50*math.sqrt(2) 
-h_UT = 1.5    
-h_BS = 50
-θ = 90.0     #zenith angle 
-θ_LOS_ZOD = -45.0   # Azimuth angle Of Departure
-θ_LOS_ZOA = 45.0   # Azimuth angle Of Arrival
+# c = 3.0*100*1000*1000 # speed of the llght
+# d_2D = 50*math.sqrt(2) 
+# h_UT = 1.5    
+# h_BS = 50
+# θ = 90.0     #zenith angle 
+# θ_LOS_ZOD = ZOD #-45.0   # Azimuth angle Of Departure
+# θ_LOS_ZOA = ZOA # 45.0   # Azimuth angle Of Arrival
 
-φ = 0.0     #azimuth angle
-φ_LOS_AOD = 0.0
-φ_LOS_AOA = 0.0
+# φ = 0.0     #azimuth angle
+# φ_LOS_AOD = AOD # 0.0
+# φ_LOS_AOA = AOA # 0.0
 
-F_rx = 0.0  #BS antenna field patterns 
-F_tx = 0.0  #UT antenna field patterns
+# F_rx = 0.0  #BS antenna field patterns 
+# F_tx = 0.0  #UT antenna field patterns
 
-Ω_BS_a = 0.0    #BS bearing angle
-Ω_BS_b = 0.0    #BS downtilt angle
-Ω_BS_c = 0.0    #BS slant angle
+# Ω_BS_a = 0.0    #BS bearing angle
+# Ω_BS_b = 0.0    #BS downtilt angle
+# Ω_BS_c = 0.0    #BS slant angle
 
-Ω_UT_a = 0.0    #UT bearing angle   方位角 
-Ω_UT_b = 10.0    #UT downtilt angle  下倾角   定义天线阵列的方位
-Ω_UT_c = 0.0    #UT slant angle     倾斜角
+# Ω_UT_a = 0.0    #UT bearing angle   方位角 
+# Ω_UT_b = 10.0    #UT downtilt angle  下倾角   定义天线阵列的方位
+# Ω_UT_c = 0.0    #UT slant angle     倾斜角
 
-UT_speed = 3.0  # Give speed and direction of motion of UT
-UT_direction = 0.0
+# UT_speed = 3.0  # Give speed and direction of motion of UT
+# UT_direction = 0.0
 
-f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
-B = 20*1000*1000     #bandwidth   20MKHz
+# f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
+# B = 20*1000*1000     #bandwidth   20MKHz
 
 #step2  Assign propagation condition (LOS/NLOS)  确定传播条件
 def Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5):  #scenario 应用场景
@@ -677,6 +675,41 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
 if __name__=='__main__': #应该使所有的函数以某个周期时间（越快越好）快速迭代运行
     
     scenario, d_2D_out, f_c = Simulation_Parameter_Setting()  #获取实验参数设置
+    
+    point1, point2, consider_building_occlusion = [0,0,5] , [50,0,1.5], False
+    AOD,AOA,ZOD,ZOA = Get_angels(point1,point2, consider_building_occlusion)
+
+    # step1 Set environment, network layout, and antenna array parameters 设置环境、网络布局和天线阵列参数  TODO Need someone to verify the parameters for me 
+    c = 3.0*100*1000*1000 # speed of the llght
+    x1,y1,z1 = point1
+    x2,y2,z2 = point2
+    d_2D = math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5) #50*math.sqrt(2) 
+    h_UT = 1.5    
+    h_BS = 50
+    θ = 90.0     #zenith angle 
+    θ_LOS_ZOD = ZOD #-45.0   # Azimuth angle Of Departure
+    θ_LOS_ZOA = ZOA # 45.0   # Azimuth angle Of Arrival
+
+    φ = 0.0     #azimuth angle
+    φ_LOS_AOD = AOD # 0.0
+    φ_LOS_AOA = AOA # 0.0
+
+    F_rx = 0.0  #BS antenna field patterns 
+    F_tx = 0.0  #UT antenna field patterns
+
+    Ω_BS_a = 0.0    #BS bearing angle
+    Ω_BS_b = 0.0    #BS downtilt angle
+    Ω_BS_c = 0.0    #BS slant angle
+
+    Ω_UT_a = 0.0    #UT bearing angle   方位角 
+    Ω_UT_b = 10.0    #UT downtilt angle  下倾角   定义天线阵列的方位
+    Ω_UT_c = 0.0    #UT slant angle     倾斜角
+
+    UT_speed = 3.0  # Give speed and direction of motion of UT
+    UT_direction = 0.0
+
+    f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
+    B = 20*1000*1000     #bandwidth   20MKHz
     
     result = []
     for i in range(10): #NRT仿真中，不在具有时间的概念，用每次循环表征一个无线传播的时隙(1ns，考虑到多径延时的度量单位为ns)，其他随时间改变的量值，通过对应的时间序列计算获取 

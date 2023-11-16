@@ -18,7 +18,7 @@ import cmath
 c = 3.0*100000000 # speed of the llght
 
 #LOS probability (distance is in meters)
-def Get_angel(point1,point2, consider_building_occlusion):
+def Get_angels(point1,point2, consider_building_occlusion):
     x1,y1,z1 = point1
     x2,y2,z2 = point2
 
@@ -26,10 +26,10 @@ def Get_angel(point1,point2, consider_building_occlusion):
         
         pass
     else:
-        AOD = math.acos((z2-z1)/math.pow(((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1))*(z2-z1)),0.5) *math.pi/180
-        ZOD = math.acos((z1-z2)/math.pow(((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1))*(z2-z1)),0.5) *math.pi/180
-        AOA = math.acos((x2-x1)/math.pow(((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1))*(z2-z1)),0.5) *math.pi/180
-        ZOA = math.acos((x1-x2)/math.pow(((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1))*(z2-z1)),0.5) *math.pi/180
+        AOD = math.acos((z2-z1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
+        ZOD = math.acos((z1-z2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
+        AOA = math.acos((x2-x1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
+        ZOA = math.acos((x1-x2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
         
     return AOD,AOA,ZOD,ZOA
  
