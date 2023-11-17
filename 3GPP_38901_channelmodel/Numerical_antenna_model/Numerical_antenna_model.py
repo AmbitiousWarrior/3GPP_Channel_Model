@@ -26,10 +26,14 @@ def Get_angels(point1,point2, consider_building_occlusion):
         
         pass
     else:
-        AOD = math.acos((z2-z1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
-        ZOD = math.acos((z1-z2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
-        AOA = math.acos((x2-x1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
-        ZOA = math.acos((x1-x2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) *math.pi/180
+        AOD = math.acos((z2-z1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) /math.pi*180
+        ZOD = math.acos((z1-z2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) /math.pi*180
+        # AOA = math.acos((x2-x1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) /math.pi*180
+        # ZOA = math.acos((x1-x2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1),0.5)) /math.pi*180
+        # 应该是三维向量在水平面上的投影与X轴的夹角，而不是三维向量与X轴的夹角
+        AOA = math.acos((x2-x1)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1),0.5)) /math.pi*180
+        ZOA = math.acos((x1-x2)/math.pow((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1),0.5)) /math.pi*180
+        
         
     return AOD,AOA,ZOD,ZOA
  

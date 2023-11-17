@@ -24,7 +24,7 @@ from Numerical_antenna_model.Numerical_antenna_model import *
 def Simulation_Parameter_Setting():
     Scenario = 'UMi_Street_canyon' #RMa, UMa, UMi_Street_canyon, InH_Office
     d_2D_out = 50*math.sqrt(2) 
-    f_c = 5.9   #*1000*1000*1000  
+    f_c = 5.9   #*1000*1000*1000  GHz
     return Scenario, d_2D_out, f_c
     
 
@@ -647,7 +647,7 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
                     if k >= 8 and k < 12 or k == 16 or k == 17:
                         temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]+ 1.28*c_DS]) 
                     if k >= 12 and k < 16:
-                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]]+ 2.56*c_DS)          
+                        temp_result1.append([H_u_s_n_m_NLOS_t*1/20,τ_n[i]+ 2.56*c_DS])          
             else:         
                 temp_result2.append(  [math.sqrt(P_n[i]/M)* np.dot( np.dot(np.array([F_rx_u_θ[i*M+j],F_rx_u_φ[i*M+j]]) , np.array([[cmath.exp(complex(0, Fei_θθ_n_m[i*M+j])),math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_θφ_n_m[i*M+j]))],[math.sqrt(1/XPR_n_m[i*M+j])*cmath.exp(complex(0, Fei_φθ_n_m[i*M+j])),cmath.exp(complex(0, Fei_φφ_n_m[i*M+j]))]])), np.array([[F_tx_s_θ[i*M+j]],[F_tx_s_φ[i*M+j]]]) ) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j] , np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_n_m[i*M+j],np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_n_m[i*M+j], np.transpose(v_))/Lambda_0), τ_n[i]])  
 
@@ -661,7 +661,10 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
         d_3D = math.sqrt(math.pow(d_2D, 2)+math.pow(abs(h_BS-h_UT), 2))
         H_u_s_1_LOS_t = np.dot( np.dot(np.array([1,1]), np.array([[1,0],[0,-1]]) ), np.array([[1],[1]])) * cmath.exp(complex(0, 1)*2*np.pi*d_3D/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS ,np.transpose(d_rx_u))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_tx_LOS ,np.transpose(d_tx_s))/Lambda_0) * cmath.exp(complex(0, 1)*2*np.pi*np.dot(r_rx_LOS , np.transpose(v_))/Lambda_0)
 
-        H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + [math.sqrt(K/(K+1))*H_u_s_1_LOS_t,τ_n[0]]
+        # H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + [math.sqrt(K/(K+1))*H_u_s_1_LOS_t,τ_n[0]]
+        print(τ_n[0],τ_n)
+        H_u_s_LOS_τ_t = math.sqrt(1/(K+1))* np.array(H_u_s_NLOS_τ_t) + math.sqrt(K/(K+1))* np.array(H_u_s_1_LOS_t)*(τ_n[-1]-τ_n[0])
+        
         return H_u_s_LOS_τ_t
     #For the two strongest clusters, say n = 1 and 2, rays are spread in delay to three sub-clusters (per cluster), with fixed delay offset.
 
@@ -676,8 +679,9 @@ if __name__=='__main__': #应该使所有的函数以某个周期时间（越快
     
     scenario, d_2D_out, f_c = Simulation_Parameter_Setting()  #获取实验参数设置
     
-    point1, point2, consider_building_occlusion = [0,0,5] , [50,0,1.5], False
+    point1, point2, consider_building_occlusion = [0,0,50] , [50,0,1.5], False
     AOD,AOA,ZOD,ZOA = Get_angels(point1,point2, consider_building_occlusion)
+    print(AOD,AOA,ZOD,ZOA)
 
     # step1 Set environment, network layout, and antenna array parameters 设置环境、网络布局和天线阵列参数  TODO Need someone to verify the parameters for me 
     c = 3.0*100*1000*1000 # speed of the llght
@@ -708,7 +712,7 @@ if __name__=='__main__': #应该使所有的函数以某个周期时间（越快
     UT_speed = 3.0  # Give speed and direction of motion of UT
     UT_direction = 0.0
 
-    f_c = 5.9*1000*1000*1000    #Specify system centre frequency  3Ghz
+    f_c = 5.9   #*1000*1000*1000    #Specify system centre frequency  3Ghz
     B = 20*1000*1000     #bandwidth   20MKHz
     
     result = []
@@ -717,33 +721,33 @@ if __name__=='__main__': #应该使所有的函数以某个周期时间（越快
         propagation_condition = Propagation_condition(scenario,d_2D_out,d_2D_in = 10,status='SL',d_clutter =10 ,r=0.2 , h_c =5) # step2 计算是否为LOS路径
         print(propagation_condition)
         PL_LOS , PL_NLOS = Calculate_pathloss(scenario,d_2D,f_c,h_BS = 50,h_UT = 1.5,h = 5,W = 20)  # step3 计算每条链路的路径损失(包含阴影衰落)
-        # print(PL_LOS , PL_NLOS)
+        print(PL_LOS , PL_NLOS)
         lsp = Generate_large_scale_parameters(scenario)  #step4 生成大尺度参数 
-        # print(lsp)
+        print('lsp',lsp)
         τ_n_ = τ_n(propagation_condition,lsp)  #step5  Generate cluster delays  τ_n
-        # print(τ_n_)
+        print('τ_n_',τ_n_)
         P_n_ = P_n(propagation_condition,lsp,τ_n_)   #step6 Generate cluster powers P_n
-        # print(P_n_)
+        print('P_n_',P_n_)
         # #step7 Generate arrival angles and departure angles for both azimuth and elevation.
         θ_n_m_ZOD_ = θ_n_m_ZOD(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
         θ_n_m_ZOA_ = θ_n_m_ZOA(propagation_condition,lsp,P_n_, BS_UT_link ='O2I')
         φ_n_m_AOA_ = φ_n_m_AOA(propagation_condition,lsp,P_n_)
         φ_n_m_AOD_ = φ_n_m_AOD(propagation_condition,lsp,P_n_)
-        # print(θ_n_m_ZOD_)
-        # print(θ_n_m_ZOA_)
-        # print(φ_n_m_AOA_)
-        # print(φ_n_m_AOD_)
+        print('θ_n_m_ZOD_',θ_n_m_ZOD_)
+        print('θ_n_m_ZOA_',θ_n_m_ZOA_)
+        print('φ_n_m_AOA_',φ_n_m_AOA_)
+        print('φ_n_m_AOD_',φ_n_m_AOD_)
         # #step8  Coupling of rays within a cluster for both azimuth and elevation
         # # TODO        
         # #step9  Generate the cross polarization power ratios
         XPR_n_m_ = XPR_n_m(propagation_condition,lsp)  
-        # print(XPR_n_m_)
+        print('XPR_n_m_',XPR_n_m_)
         # #step10  Draw initial random phases
         Fei_θθ_n_m, Fei_θφ_n_m, Fei_φθ_n_m, Fei_φφ_n_m = Initial_random_phases_n_m(lsp,propagation_condition)
-        # print(Fei_θθ_n_m)
-        # print(Fei_θφ_n_m)
-        # print(Fei_φθ_n_m)
-        # print(Fei_φφ_n_m)
+        print('Fei_θθ_n_m',Fei_θθ_n_m)
+        print('Fei_θφ_n_m',Fei_θφ_n_m)
+        print('Fei_φθ_n_m',Fei_φθ_n_m)
+        print('Fei_φφ_n_m',Fei_φφ_n_m)
         # #step11  Generate channel coefficients for each cluster n and each receiver and transmitter element pair u, s.
         H_u_s = Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA_,φ_n_m_AOD_,θ_n_m_ZOA_,θ_n_m_ZOD_,  Fei_θθ_n_m,Fei_θφ_n_m,Fei_φθ_n_m,Fei_φφ_n_m,  XPR_n_m_,  τ_n_,  P_n_ )
         print('H_u_s',H_u_s)
