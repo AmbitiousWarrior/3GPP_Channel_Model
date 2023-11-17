@@ -663,7 +663,7 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
 
         # H_u_s_LOS_τ_t = math.sqrt(1/(K+1))*H_u_s_NLOS_τ_t + [math.sqrt(K/(K+1))*H_u_s_1_LOS_t,τ_n[0]]
         print(τ_n[0],τ_n)
-        H_u_s_LOS_τ_t = math.sqrt(1/(K+1))* np.array(H_u_s_NLOS_τ_t) + math.sqrt(K/(K+1))* np.array(H_u_s_1_LOS_t)*(τ_n[-1]-τ_n[0])
+        H_u_s_LOS_τ_t = math.log((1/(K+1)),2)* np.array(H_u_s_NLOS_τ_t) + math.log((1/(K+1)),2)* np.array(H_u_s_1_LOS_t)*(τ_n[-1]-τ_n[0])
         
         return H_u_s_LOS_τ_t
     #For the two strongest clusters, say n = 1 and 2, rays are spread in delay to three sub-clusters (per cluster), with fixed delay offset.
