@@ -596,7 +596,7 @@ def  Generate_channel_coefficients(lsp,propagation_condition,f_c,  φ_n_m_AOA,φ
             F_tx_s_θ.append(1) 
             F_tx_s_φ.append(1) 
             
-    Lambda_0 = c/f_c/(1000*1000*1000)  # the wavelength of the carrier frequency
+    Lambda_0 = c/(f_c*1000*1000*1000)  # the wavelength of the carrier frequency
                 
     r_rx_n_m = []      
     r_tx_n_m = []         
